@@ -3,7 +3,7 @@ project:
   output-dir: docs          
 
 website:
-  title: "Ashley Lee | W10 Portfolio Assignment"
+  title: "Ashley Lee | W11 Portfolio Assignment"
   navbar:
     left:
       - text: "Home"

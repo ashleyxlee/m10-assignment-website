@@ -2,3 +2,6 @@
 .DS_Store
 *.rds
 shiny-app/ga4_events_28d.rds
+
+/.quarto/
+**/*.quarto_ipynb

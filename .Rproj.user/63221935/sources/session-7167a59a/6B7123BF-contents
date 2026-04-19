@@ -1,11 +1,9 @@
 ---
-title: "shinylive_essay"
+title: "Essay On Shinylive"
 author: "Ashley Lee"
 format: html
 editor: visual
 ---
-
-## **Essay on Shiny Live**
 
 One of the biggest differences Shinylive differs from Shiny Apps is **how the code is executed.** Shinylive takes the R server and “**moves**” the R instance into the individual's browser by going to the URL, waiting for the download, and in turn providing a fully functioning application.
 

@@ -1,0 +1,14 @@
+---
+title: "Lee, Ashley_W11-Hands-on Practice Assignment"
+author: "Ashley Lee"
+format: html
+editor: visual
+---
+
+1.  The URL of the website on Netlify: <https://alweek11assignment.netlify.app/>
+
+2.  The URL of the website on the Github repo, which should include all files you created: <https://github.com/ashleyxlee/m10-assignment-website>
+
+::: callout-note
+I named Github repo as Week 10, when it should have been Week 11. I was unable to change the URL.
+:::
