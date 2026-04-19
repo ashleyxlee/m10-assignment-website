@@ -1,0 +1,285 @@
+---
+title: "Dashboard Assignment - TRI Page View Analysis"
+subtitle: "Analyzing if Users Visit More Pages Before Converting"
+author: "Ashley Lee"
+date: today
+format:
+  dashboard:
+    orientation: rows
+    theme: cosmo
+    scrolling: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(plotly)
+library(scales)
+library(DT)
+library(forcats)
+library(htmltools)
+library(here)
+```
+
+## Load Data
+
+```{r}
+ga4_events_28d <- readRDS(here::here("shiny-app/ga4_events_28d.rds"))
+
+ga4_events_28d <- ga4_events_28d |>
+  mutate(
+    event_date = as.Date(event_date, format = "%Y%m%d"),
+    source = ifelse(is.na(source) | source == "", "Unknown", source),
+    medium = ifelse(is.na(medium) | medium == "", "Unknown", medium),
+    campaign_name = ifelse(is.na(campaign_name) | campaign_name == "", "Unknown", campaign_name),
+    device_category = ifelse(is.na(device_category) | device_category == "", "Unknown", device_category),
+    country = ifelse(is.na(country) | country == "", "Unknown", country)
+  )
+
+df_sessions <- ga4_events_28d |>
+  group_by(user_pseudo_id, device_category, source, medium, campaign_name, country) |>
+  summarise(
+    is_booking_conversion  = as.integer(any(event_name == "checkout_started")),
+    is_donation_conversion = as.integer(any(event_name == "donate_button_click")),
+    is_email_conversion    = as.integer(any(event_name == "newsletter_signup")),
+    training_page_view     = as.integer(any(event_name == "training_page_view")),
+    page_views             = sum(event_name == "page_view"),
+    is_new_user            = as.integer(any(event_name == "first_visit")),
+    total_revenue          = sum(purchase_revenue, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  mutate(
+    device_category = factor(device_category, levels = c("desktop", "mobile", "tablet")),
+    source_email    = as.integer(source == "email"),
+    is_returning    = 1L - is_new_user
+  )
+
+analysis_df <- df_sessions %>%
+  filter(page_views > 0, page_views <= 50)
+sessions_n <- nrow(analysis_df)
+conversions_n <- sum(analysis_df$is_booking_conversion)
+baseline_rate <- 100 * mean(analysis_df$is_booking_conversion)
+avg_pages <- mean(analysis_df$page_views)
+median_pages <- median(analysis_df$page_views)
+```
+
+## Page Threshold Analysis
+
+```{r}
+page_threshold_df <- df_sessions %>%
+  filter(page_views > 0, page_views <= 50) %>%
+  mutate(
+    page_view_bucket = case_when(
+      page_views == 1 ~ "1 page",
+      page_views >= 2 & page_views <= 3 ~ "2-3 pages",
+      page_views >= 4 & page_views <= 6 ~ "4-6 pages",
+      page_views >= 7 & page_views <= 15 ~ "7-15 pages",
+      page_views > 15 ~ "16-50 pages"
+    ),
+    page_view_bucket = factor(
+      page_view_bucket,
+      levels = c("1 page", "2-3 pages", "4-6 pages", "7-15 pages", "16-50 pages")
+    ),
+    above_threshold = page_views >= 4
+  ) %>%
+  group_by(page_view_bucket, above_threshold) %>%
+  summarise(
+    sessions = n(),
+    conversions = sum(is_booking_conversion),
+    conv_rate = 100 * conversions / sessions,
+    .groups = "drop"
+  )
+```
+
+# TRI Page View - Overview
+
+## Overview {.card-title}
+
+### Story {.card-title}
+
+**Story**
+
+This dashboard examines whether users who view more pages are more likely to begin the booking process. The analysis uses a session-level dataset derived from GA4 events. Conversion is defined as a session that includes a `checkout_started` event.
+
+### Key Insights
+
+**Key Insights**
+
+-   60.1% of sessions end after just 1 page.
+
+-   Sessions with 1-3 page views convert at less than 0.5%.
+
+-   Conversion rises to 2.71% at 4-6 pages and 9.65% at 7-15 pages.
+
+-   Highly engaged sessions with 16-50 page views convert at 28.57%.
+
+-   These results suggest a meaningful engagement threshold at 4+ page views.
+
+### Conclusion
+
+**Conclusion**
+
+This analysis shows a clear relationship between page depth and booking intent. Users who browse more deeply through the TRI website are much more likely to begin the checkout process. The largest opportunity for improvement may be increasing early-session engagement so that more users move beyond the first few pages.
+
+
+# TRI Page View - Analysis
+
+**Analysis #1: Overview of Key Metrics**
+
+```{r}
+analysis_df <- df_sessions %>%
+  filter(page_views > 0, page_views <= 50)
+
+overview_df <- data.frame(
+  Metric = c(
+    "Sessions analyzed",
+    "Booking conversions",
+    "Baseline conversion rate",
+    "Average page views per session",
+    "Median page views per session"
+  ),
+  Value = c(
+    scales::comma(nrow(analysis_df)),
+    scales::comma(sum(analysis_df$is_booking_conversion)),
+    scales::percent(mean(analysis_df$is_booking_conversion), accuracy = 0.01),
+    round(mean(analysis_df$page_views), 2),
+    median(analysis_df$page_views)
+  )
+)
+
+DT::datatable(
+  overview_df,
+  options = list(dom = "t", paging = FALSE),
+  rownames = FALSE
+)
+```
+
+**Analysis #2: Does Conversion Increase if Users Visit More pages?**
+
+```{r}
+threshold_data <- analysis_df %>%
+  mutate(
+    page_view_bucket = case_when(
+      page_views == 1 ~ "1 page",
+      page_views >= 2 & page_views <= 3 ~ "2-3 pages",
+      page_views >= 4 & page_views <= 6 ~ "4-6 pages",
+      page_views >= 7 & page_views <= 15 ~ "7-15 pages",
+      page_views >= 16 & page_views <= 50 ~ "16-50 pages"
+    ),
+    page_view_bucket = factor(
+      page_view_bucket,
+      levels = c("1 page", "2-3 pages", "4-6 pages", "7-15 pages", "16-50 pages")
+    ),
+    above_threshold = page_views >= 4
+  ) %>%
+  group_by(page_view_bucket, above_threshold) %>%
+  summarise(
+    sessions = n(),
+    conversions = sum(is_booking_conversion),
+    conv_rate = 100 * conversions / sessions,
+    .groups = "drop"
+  )
+
+baseline_rate <- 100 * mean(analysis_df$is_booking_conversion)
+  
+```
+
+```{r}
+ggplot(threshold_data, aes(x = page_view_bucket, y = conv_rate, fill = above_threshold)) +
+  geom_col(width = 0.6) +
+  geom_hline(
+    yintercept = baseline_rate,
+    linetype = "dashed",
+    color = "grey",
+    linewidth = 0.5
+  ) +
+  geom_text(
+    aes(label = paste0(round(conv_rate, 2), "%")),
+    vjust = -0.4,
+    size = 3.8,
+    fontface = "bold"
+  ) +
+  scale_fill_manual(
+    values = c("FALSE" = "grey", "TRUE" = "blue"),
+    labels = c(
+      "FALSE" = "Below threshold (1-3 pages)",
+      "TRUE" = "Above threshold (4+ pages)"
+    ),
+    name = NULL
+  ) +
+  labs(
+    title = "Conversion Rate Increases If Users Cross 4+ Pages",
+    x = "Page View bucket",
+    y = "Conversion rate (%)",
+    caption = paste0(
+      "Sessions with 0 page views and more than 50 page views were excluded.",
+      "Dashed line = baseline conversion rate (",
+      round(baseline_rate, 2),
+      "%)."
+    )
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    plot.caption = element_text(size = 9, color = "grey", hjust = 0),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(),
+    legend.position = "bottom"
+  )
+```
+
+**Analysis #2.5: Conversion Rate Per View Bucket**
+
+```{r}
+threshold_table <- analysis_df %>%
+  mutate(
+    `Page View Bucket` = case_when(
+      page_views == 1 ~ "1 page",
+      page_views >= 2 & page_views <= 3 ~ "2-3 pages",
+      page_views >= 4 & page_views <= 6 ~ "4-6 pages",
+      page_views >= 7 & page_views <= 15 ~ "7-15 pages",
+      page_views >= 16 & page_views <= 50 ~ "16-50 pages"
+    ),
+    `Page View Bucket` = factor(
+      `Page View Bucket`,
+      levels = c("1 page", "2-3 pages", "4-6 pages", "7-15 pages", "16-50 pages")
+    )
+  ) %>%
+  group_by(`Page View Bucket`) %>%
+  summarise(
+    Sessions = n(),
+    `% of Total Sessions` = round(100 * Sessions / nrow(analysis_df), 1),
+    Conversions = sum(is_booking_conversion),
+    `Conversion Rate` = round(100 * Conversions / Sessions, 2),
+    .groups = "drop"
+  )
+
+DT::datatable(
+  threshold_table,
+  options = list(dom = "t", paging = FALSE),
+  rownames = FALSE
+)
+```
+
+**Analysis #3: How Many Pages Are Viewers Going Through?**
+
+```{r}
+exit_dist <- analysis_df %>%
+  count(page_views) %>%
+  filter(page_views <= 15)
+
+ggplot(exit_dist, aes(x = page_views, y = n)) +
+  geom_col() +
+  geom_text(aes(label = n), vjust = -0.3, size = 3.5) +
+  labs(
+    title = "Most sessions end after a few page views",
+    x = "Page views in session",
+    y = "Number of sessions"
+  ) +
+  theme_minimal(base_size = 13)
+```

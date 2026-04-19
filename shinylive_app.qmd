@@ -1,0 +1,27 @@
+---
+title: "shinylive_essay"
+author: "Ashley Lee"
+format: html
+editor: visual
+---
+
+## **Essay on Shiny Live**
+
+One of the biggest differences Shinylive differs from Shiny Apps is **how the code is executed.** Shinylive takes the R server and “**moves**” the R instance into the individual's browser by going to the URL, waiting for the download, and in turn providing a fully functioning application.
+
+How Does It Work?
+
+-   No heavy duty servers are required when using Shiny.
+
+-   This is done using a shinylive::export() function in which there is an import file, then is rendered or transformed into a html-folder that contains code built by {webr}.
+
+-   The only requirement is that the exported folder must be hosted and ran locally for the preview.
+
+::: callout-note
+Github provides an additional layer of assistance by hosting the static website and deploying from there.
+:::
+
+\
+Additional benefits to using Shinylive also minimizes the required usage of {webr}, essentially minimizing the start time that it takes for the files and packages to render. Because of Shinylive’s server-less approach, there is no installation required and simply opening a URL will provide a user with full-fledged R applications.
+
+Lastly, security is paramount, and the code stays with the browser’s sandbox function and is not publicly compromised. Some important limitations to consider is that start-up time can be extraneous on a user’s computer, since a requirement of Shinylive is to download and digest the entire runtime environment of R. Note that all packages aren't available through this function and must first be compiled for WebAssembly.

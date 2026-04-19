@@ -1,0 +1,23 @@
+project:
+  type: website
+  output-dir: docs          
+
+website:
+  title: "Ashley Lee | W10 Portfolio Assignment"
+  navbar:
+    left:
+      - text: "Home"
+        href: HomePage.qmd
+      - text: "Shiny Dashboard"
+        href: quarto-dashboard.qmd   
+      - text: "Shiny App"
+        href: shiny-app/shiny_app.qmd          
+      - text: "Shinylive Essay"
+        href: shinylive_app.qmd                   
+
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: false

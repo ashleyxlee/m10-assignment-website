@@ -1,0 +1,10 @@
+name: msdm-project
+title: TRI Conversion Analytics
+username: ashleyxlee
+account: ashleyxlee
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 17157037
+bundleId: 11862999
+url: https://ashleyxlee.shinyapps.io/msdm-project/
+version: 1

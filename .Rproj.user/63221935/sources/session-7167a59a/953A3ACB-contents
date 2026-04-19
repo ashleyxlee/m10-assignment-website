@@ -1,0 +1,63 @@
+---
+title: "Welcome!"
+format:
+  html:
+    page-layout: full
+    css: styles.css
+---
+
+::: hero-section
+::: profile-img-wrap
+![](ashley-headshot.jpg){.profile-img}
+:::
+
+::: hero-text
+# Ashley Lee
+
+**MS Digital Marketing - Cal Poly Pomona**
+
+I am a marketing procurement professional leveraging data analytics to drive strategic supplier and agency relationships. I manage vendor strategy, agency partnerships, and sourcing across key tentpole events and high-visibility product launches.
+:::
+:::
+
+------------------------------------------------------------------------
+
+## About Me
+
+I hold a Bachelor’s in Business Administration from the University of California, Riverside & and am currently pursuing my Master’s in Digital Marketing at Cal Poly Pomona.
+
+Outside of work & school, I enjoy trying new restaurants around Southern California, traveling, and making my daily matcha drink!
+
+## Skills
+
+::: skills-grid
+::: skill-card
+### Analytics - Software
+
+R, Quarto, Shiny, Tableau, SQL
+:::
+
+::: skill-card
+### Google Analytics 
+
+GA4, BigQuery, LookerStudio
+:::
+:::
+
+------------------------------------------------------------------------
+
+## Education
+
+::: education-block
+**Master of Science in Digital Marketing**\
+California State Polytechnic University, Pomona - *Exp. 2026*
+
+**Bachelor of Science, Business Administration**\
+University of California, Riverside - 2021
+:::
+
+------------------------------------------------------------------------
+
+## Projects
+
+Explore my work using the tabs above — including an interactive **Quarto Dashboard**, a **Shiny App**, and an **essay on Shinylive**.

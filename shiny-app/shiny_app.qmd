@@ -1,0 +1,13 @@
+---
+title: "TRI Conversion Analytics"
+subtitle: "Interactive GA4 session-level dashboard for the Trauma Resource Institute"
+format: html
+---
+
+## About This App
+
+This Shiny application analyzes **28 days of GA4 event-level data** for the Trauma Resource Institute (TRI). It tracks user sessions, conversion funnels, page depth behavior, device breakdowns, and traffic sources — and fits a logistic regression model to identify predictors of booking conversions.
+
+## Launch the App
+
+[Shiny App](https://ashleyxlee.shinyapps.io/msdm-project/){.btn .btn-primary target="_blank"}

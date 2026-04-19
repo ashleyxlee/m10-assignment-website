@@ -1,0 +1,23 @@
+{
+  "3. Shiny App/shiny_app_final.qmd": {
+    "shiny_app_final.html": "2018961c"
+  },
+  "shiny_app.qmd": {
+    "shiny_app.html": "15b9f814"
+  },
+  "shinylive_app.qmd": {
+    "shinylive_app.html": "ab1e6019"
+  },
+  "HomePage.qmd": {
+    "HomePage.html": "9ca77d90"
+  },
+  "shiny-app/shiny-app:shiny_app.qmd": {
+    "shiny-app:shiny_app.html": "3dbe6b65"
+  },
+  "shiny-app/shiny_app.qmd": {
+    "shiny_app.html": "d12f2563"
+  },
+  "quarto-dashboard.qmd": {
+    "quarto-dashboard.html": "8eaf9e2f"
+  }
+}
